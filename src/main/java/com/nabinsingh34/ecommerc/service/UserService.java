@@ -1,5 +1,7 @@
 package com.nabinsingh34.ecommerc.service;
 
+import com.nabinsingh34.ecommerc.dto.LoginRequest;
+import com.nabinsingh34.ecommerc.dto.LoginResponse;
 import com.nabinsingh34.ecommerc.dto.UserRequest;
 import com.nabinsingh34.ecommerc.exception.SpringEcommerceException;
 import com.nabinsingh34.ecommerc.model.NotificationEmail;
@@ -7,8 +9,14 @@ import com.nabinsingh34.ecommerc.model.User;
 import com.nabinsingh34.ecommerc.model.VerificationToken;
 import com.nabinsingh34.ecommerc.repo.UserRepository;
 import com.nabinsingh34.ecommerc.repo.VerificationRepository;
-import org.aspectj.weaver.ast.Not;
+import com.nabinsingh34.ecommerc.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -27,17 +35,35 @@ public class UserService {
     @Autowired
     private MailService mailService;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    UserDetailsService userDetailsService;
+
+    @Autowired
+    JwtUtils jwtUtils;
+
+
     public void createUser(UserRequest userRequest) {
         User user= new User();
         user.setEmail(userRequest.getEmail());
         user.setFirst_name(userRequest.getFirst_name());
         user.setLast_name(userRequest.getLast_name());
-        user.setPassword(userRequest.getPassword());
+        user.setPassword(encodePassword(userRequest.getPassword()));
         user.setEnabled(false);
+        user.setRole("USER");
         userRepository.save(user);
         String activateLink="Thank you for singing up. Please click the link below ur to activate your account:  http://localhost:8080/api/user/accountVerification/";
         String token = generateVerificationToken(user);
         mailService.sendMail(new NotificationEmail("Please Activate your account",user.getEmail(),activateLink+token));
+    }
+
+    private String encodePassword(String password) {
+        return passwordEncoder.encode(password);
     }
 
     private String generateVerificationToken(User user) {
@@ -66,4 +92,16 @@ public class UserService {
         }
 
     }
+
+    public String login(LoginRequest loginRequest) throws Exception {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+        } catch (BadCredentialsException e){
+            throw new Exception("Incorrect user name or password");
+        }
+        final UserDetails userDetails= userDetailsService.loadUserByUsername(loginRequest.getEmail());
+        String jwt= jwtUtils.generateToken(userDetails);
+        return jwt;
+    }
+
 }

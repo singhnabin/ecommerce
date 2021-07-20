@@ -1,5 +1,7 @@
 package com.nabinsingh34.ecommerc.controller;
 
+import com.nabinsingh34.ecommerc.dto.LoginRequest;
+import com.nabinsingh34.ecommerc.dto.LoginResponse;
 import com.nabinsingh34.ecommerc.dto.UserRequest;
 import com.nabinsingh34.ecommerc.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,16 @@ public class UserController {
         userService.verifyAccount(token);
         return ResponseEntity.status(HttpStatus.OK).body("Account activated successfully");
     }
+
+
+    @PostMapping(value = "/login",produces = "application/json")
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) throws Exception {
+        String token=userService.login(loginRequest);
+       return ResponseEntity.ok(new LoginResponse(200,loginRequest.getEmail(),token)) ;
+
+    }
+
+
 //    @ResponseStatus(HttpStatus.BAD_REQUEST)
 //    @ExceptionHandler(MethodArgumentNotValidException.class)
 //    public Map<String, String> handleValidationExceptions(

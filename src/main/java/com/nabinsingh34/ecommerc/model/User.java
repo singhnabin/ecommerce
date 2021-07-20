@@ -37,6 +37,9 @@ public class User {
     @Column
     private boolean isEnabled;
 
+    @Column
+    private String role;
+
 
 
 }

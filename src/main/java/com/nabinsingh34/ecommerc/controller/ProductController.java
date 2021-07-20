@@ -25,7 +25,10 @@ public class ProductController {
         productService.createProduct(productRequest);
         return ResponseEntity.status(HttpStatus.OK).body("Image saved");
 
+    }
 
-
+    @GetMapping("/hello")
+    public String admin(){
+        return "i am admin";
     }
 }
