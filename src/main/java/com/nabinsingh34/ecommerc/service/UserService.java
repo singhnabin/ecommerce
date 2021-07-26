@@ -1,7 +1,7 @@
 package com.nabinsingh34.ecommerc.service;
 
+import com.nabinsingh34.ecommerc.dto.EditUser;
 import com.nabinsingh34.ecommerc.dto.LoginRequest;
-import com.nabinsingh34.ecommerc.dto.LoginResponse;
 import com.nabinsingh34.ecommerc.dto.UserRequest;
 import com.nabinsingh34.ecommerc.exception.SpringEcommerceException;
 import com.nabinsingh34.ecommerc.model.NotificationEmail;
@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -104,4 +105,42 @@ public class UserService {
         return jwt;
     }
 
+    public Optional<User> findUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public Optional<User> getUserById(int user_id) {
+        return userRepository.findById(user_id);
+    }
+
+
+
+
+    public User mapOptionUserToUser(User userExists) {
+            User user= new User();
+            user.setRole(userExists.getRole());
+            user.setFirst_name(userExists.getFirst_name());
+            user.setLast_name(userExists.getLast_name());
+            user.setEmail(userExists.getEmail());
+
+            return user;
+
+
+    }
+
+
+    public void editUserDetails(EditUser editUser,User user) {
+        user.setLast_name(editUser.getLast_name());
+        user.setFirst_name(editUser.getFirst_name());
+        user.setEmail(editUser.getEmail());
+        userRepository.save(user);
+    }
+
+    public void deleteById(int user_id) {
+        userRepository.deleteById(user_id);
+    }
+
+    public List<User> getAllUserById() {
+        return userRepository.findAll();
+    }
 }

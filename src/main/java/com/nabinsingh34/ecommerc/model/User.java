@@ -1,11 +1,13 @@
 package com.nabinsingh34.ecommerc.model;
 
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
+
 
 @Entity
 @Data
@@ -18,21 +20,19 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(unique = true)
-    @NotBlank(message="email cannont be blank")
+    @Column
     private String email;
 
     @Column
-    @NotBlank(message = "First Name cannot be blank")
     private String first_name;
 
     @Column
-    @NotBlank(message = "Last Name cannot be blank")
     private String last_name;
 
     @Column
-    @NotBlank(message = "Password cannot be blank")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+
 
     @Column
     private boolean isEnabled;

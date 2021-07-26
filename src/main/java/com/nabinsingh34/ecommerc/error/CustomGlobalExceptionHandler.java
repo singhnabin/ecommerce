@@ -2,6 +2,7 @@ package com.nabinsingh34.ecommerc.error;
 
 
 import com.nabinsingh34.ecommerc.dto.ErrorResponse;
+import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.ConstraintViolationException;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +23,12 @@ import java.util.stream.Collectors;
 public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 {
     private static final String BAD_REQUEST = "BAD_REQUEST";
+
+    @ExceptionHandler(ConfigDataResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> resourceNotFoundException(ConfigDataResourceNotFoundException resourceNotFoundException,WebRequest webRequest){
+        ErrorResponse errorResponse= new ErrorResponse("NOT_FOUND", Collections.singletonList(resourceNotFoundException.getMessage()),HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(errorResponse,HttpStatus.NOT_FOUND);
+    }
 
     @ExceptionHandler(ConstraintViolationException.class)
     public final ResponseEntity<ErrorResponse> handleConstraintViolation(
