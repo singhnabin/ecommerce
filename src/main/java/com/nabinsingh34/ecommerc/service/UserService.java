@@ -10,10 +10,13 @@ import com.nabinsingh34.ecommerc.model.VerificationToken;
 import com.nabinsingh34.ecommerc.repo.UserRepository;
 import com.nabinsingh34.ecommerc.repo.VerificationRepository;
 import com.nabinsingh34.ecommerc.utils.JwtUtils;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,7 +25,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -94,15 +99,22 @@ public class UserService {
 
     }
 
-    public String login(LoginRequest loginRequest) throws Exception {
+    public JSONObject login(LoginRequest loginRequest) throws Exception {
+        JSONObject jsonObject= new JSONObject();
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         } catch (BadCredentialsException e){
             throw new Exception("Incorrect user name or password");
         }
         final UserDetails userDetails= userDetailsService.loadUserByUsername(loginRequest.getEmail());
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+
+        Set<String> roles = authentication.getAuthorities().stream()
+                .map(r -> r.getAuthority()).collect(Collectors.toSet());
         String jwt= jwtUtils.generateToken(userDetails);
-        return jwt;
+        jsonObject.put("token",jwt);
+        jsonObject.put("roles",roles);
+        return jsonObject;
     }
 
     public Optional<User> findUserByEmail(String email) {

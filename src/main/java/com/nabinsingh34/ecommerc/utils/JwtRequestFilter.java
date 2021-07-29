@@ -23,6 +23,27 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtils jwtUtil;
 
+//    @Override
+//    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
+//        String authHeader = httpServletRequest.getHeader("Authorization");
+//        String email = null;
+//        String token = null;
+//        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+//            token = authHeader.substring(7);
+//            email = jwtUtil.extractUsername(token);
+//        }
+//        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+//            UserDetails userDetails = userDetailService.loadUserByUsername(email);
+//            if (jwtUtil.validateToken(token, userDetails)) {
+//                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, userDetails.getAuthorities());
+//                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
+//                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+//                ;
+//            }
+//            filterChain.doFilter(httpServletRequest, httpServletResponse);
+//        }
+//    }}
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {

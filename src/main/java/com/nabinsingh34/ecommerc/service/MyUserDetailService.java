@@ -24,11 +24,13 @@ public class MyUserDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
        Optional<User> userOptional= userRepository.findByEmail(username);
        User user=userOptional.orElseThrow(()->new UsernameNotFoundException("User not found in db"));
+        System.out.println(user.getRole());
 
-        return new org.springframework.security.core.userdetails.User(user.getEmail(),user.getPassword(),user.isEnabled(),true,true,true,getAuthorities(user.getRole()));
+        return new org.springframework.security.core.userdetails.User(user.getEmail(),user.getPassword(),user.isEnabled(),true,true,true,setAuthorities(user.getRole()));
     }
 
-    private Collection<? extends GrantedAuthority> getAuthorities(String role) {
+    private Collection<? extends GrantedAuthority> setAuthorities(String role) {
         return Collections.singletonList(new SimpleGrantedAuthority(role));
     }
+
 }
